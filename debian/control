@@ -1,0 +1,12 @@
+Source: linux-mint-cleaner
+Section: utils
+Priority: optional
+Maintainer: skyss0fly <skyss0flypersonal@gmail.com>
+Standards-Version: 4.5.0
+Build-Depends: debhelper (>= 12)
+
+Package: linux-mint-cleaner
+Architecture: all
+Depends: bash, sudo
+Description: Linux Mint Cleaner
+ A simple tool to clean caches, Flatpak leftovers, Trash, and Timeshift snapshots safely.
