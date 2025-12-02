@@ -26,12 +26,14 @@ jobs:
         run: |
           mkdir -p package/usr/local/bin package/usr/share/applications package/usr/share/icons/hicolor/scalable/apps
           cp src/mint-cleaner.sh package/usr/local/bin/mint-cleaner
+          chmod 755 package/usr/local/bin/mint-cleaner
           cp desktop/mint-cleaner.desktop package/usr/share/applications/mint-cleaner.desktop
           cp icons/system-cleaner.svg package/usr/share/icons/hicolor/scalable/apps/system-cleaner.svg
           mkdir -p package/DEBIAN
           cp debian/postinst package/DEBIAN/postinst
           cp debian/prerm package/DEBIAN/prerm
           chmod 755 package/DEBIAN/postinst package/DEBIAN/prerm
+          
 
       # 4. Create DEBIAN control file with updated dependencies
       - name: Create DEBIAN control file
