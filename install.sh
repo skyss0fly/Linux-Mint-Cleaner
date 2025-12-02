@@ -1,28 +1,81 @@
 #!/bin/bash
+set -euo pipefail
 
-set -e
+# ------------------------
+# Linux Mint Cleaner Installer
+# ------------------------
+
+# Project folder paths (relative to installer)
+SCRIPT_SRC="./src/mint-cleaner.sh"
+DESKTOP_SRC="./desktop/mint-cleaner.desktop"
+ICON_SRC="./icons/system-cleaner.svg"
+
+# Destination paths
+BIN_DEST="/usr/local/bin/mint-cleaner"
+DESKTOP_DEST="/usr/share/applications/mint-cleaner.desktop"
+ICON_DEST="/usr/share/icons/hicolor/scalable/apps/system-cleaner.svg"
+
 
 echo "Installing Linux Mint Cleaner..."
 
-# Install main script
-sudo mkdir -p /usr/local/bin
-sudo cp src/mint-cleaner.sh /usr/local/bin/mint-cleaner
-sudo chmod +x /usr/local/bin/mint-cleaner
+# ------------------------
+# 1️⃣ Copy main script
+# ------------------------
+if [ ! -f "$SCRIPT_SRC" ]; then
+    echo "Error: $SCRIPT_SRC not found. Make sure you run this from project root."
+    exit 1
+fi
+sudo cp "$SCRIPT_SRC" "$BIN_DEST"
+sudo chmod +x "$BIN_DEST"
+echo "✅ Script installed to $BIN_DEST"
 
-# Install desktop file
-sudo mkdir -p /usr/local/share/applications
-sudo cp desktop/mint-cleaner.desktop /usr/local/share/applications/
-sudo chmod 644 /usr/local/share/applications/mint-cleaner.desktop
-
-# Install icon
-if [ -f icons/system-cleaner.png ]; then
-    sudo mkdir -p /usr/local/share/icons/hicolor/48x48/apps
-    sudo cp icons/system-cleaner.png /usr/local/share/icons/hicolor/48x48/apps/mint-cleaner.png
+# ------------------------
+# 2️⃣ Copy desktop launcher
+# ------------------------
+if [ ! -f "$DESKTOP_SRC" ]; then
+    echo "Error: $DESKTOP_SRC not found."
+    exit 1
 fi
 
-echo "Updating icon cache..."
-sudo update-icon-caches /usr/local/share/icons/hicolor || true
+# Fix the desktop file: ensure Exec points to /usr/local/bin and absolute icon path
+TMP_DESKTOP=$(mktemp)
+awk -v exec="$BIN_DEST" -v icon="$ICON_DEST" '
+    /^Exec=/ {$0="Exec=" exec}
+    /^Icon=/ {$0="Icon=" icon}
+    {print}
+' "$DESKTOP_SRC" > "$TMP_DESKTOP"
 
-echo "Installation complete!"
-echo "You can now launch 'Linux Mint Cleaner' from the Mint menu."
+sudo cp "$TMP_DESKTOP" "$DESKTOP_DEST"
+sudo chmod 644 "$DESKTOP_DEST"
+rm "$TMP_DESKTOP"
+echo "✅ Desktop launcher installed to $DESKTOP_DEST"
+
+# ------------------------
+# 3️⃣ Copy icon
+# ------------------------
+if [ -f "$ICON_SRC" ]; then
+    sudo mkdir -p "$(dirname "$ICON_DEST")"
+    sudo cp "$ICON_SRC" "$ICON_DEST"
+    echo "✅ Icon installed to $ICON_DEST"
+else
+    echo "⚠ Icon not found. Skipping."
+fi
+
+
+# ------------------------
+# 4️⃣ Update caches
+# ------------------------
+echo "Updating icon cache..."
+sudo gtk-update-icon-cache /usr/share/icons/hicolor || true
+
+echo "Updating desktop database..."
+sudo update-desktop-database /usr/share/applications || true
+
+# ------------------------
+# 5️⃣ Finished
+# ------------------------
+echo "🎉 Installation complete!"
+echo "You can now launch 'Linux Mint Cleaner' from the Mint menu or by running:"
+echo "mint-cleaner"
+
 
