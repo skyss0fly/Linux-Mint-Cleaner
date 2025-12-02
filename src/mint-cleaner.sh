@@ -8,8 +8,14 @@
 
 set -euo pipefail
 
-LOGFILE="$HOME/.local/share/mint-cleaner.log"
-mkdir -p "$(dirname "$LOGFILE")"
+LOGFILE="/usr/share/mint-cleaner.log"
+DIR="$(dirname "$LOGFILE")"
+
+# Create the directory with root privileges
+sudo mkdir -p "$DIR"
+
+sudo touch "$LOGFILE"
+sudo chmod 644 "$LOGFILE"
 
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$LOGFILE"
