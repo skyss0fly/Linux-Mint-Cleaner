@@ -1,11 +1,8 @@
 #!/bin/bash
 set -e
 
-# Remove files
-rm -f /usr/local/bin/mint-cleaner
-rm -f /usr/share/applications/mint-cleaner.desktop
-rm -f /usr/share/icons/hicolor/scalable/apps/system-cleaner.svg
+# Update caches after removal (non-blocking)
+(gtk-update-icon-cache /usr/share/icons/hicolor || true) &
+(update-desktop-database /usr/share/applications || true) &
 
-# Update caches
-gtk-update-icon-cache /usr/share/icons/hicolor || true
-update-desktop-database /usr/share/applications || true
+exit 0
