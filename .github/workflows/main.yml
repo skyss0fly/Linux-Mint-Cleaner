@@ -8,7 +8,7 @@ jobs:
   build-deb:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
+      - name: Checkout
         uses: actions/checkout@v3
 
       - name: Install dependencies
@@ -19,18 +19,13 @@ jobs:
           mkdir -p package/usr/local/bin
           mkdir -p package/usr/share/applications
           mkdir -p package/usr/share/icons/hicolor/scalable/apps
-          mkdir -p package/DEBIAN
-
-          # Copy files
           cp src/mint-cleaner.sh package/usr/local/bin/mint-cleaner
           cp desktop/mint-cleaner.desktop package/usr/share/applications/mint-cleaner.desktop
           cp icons/system-cleaner.svg package/usr/share/icons/hicolor/scalable/apps/system-cleaner.svg
+          mkdir -p package/DEBIAN
           cp debian/postinst package/DEBIAN/postinst
           cp debian/prerm package/DEBIAN/prerm
-
-          # Set permissions
-          chmod 755 package/DEBIAN/postinst
-          chmod 755 package/DEBIAN/prerm
+          chmod 755 package/DEBIAN/postinst package/DEBIAN/prerm
 
       - name: Create DEBIAN control file
         run: |
@@ -41,16 +36,15 @@ jobs:
           Priority: optional
           Architecture: all
           Maintainer: skyss0fly <skyss0flypersonal@gmail.com>
-          Description: Linux Mint Cleaner - Clean caches, Flatpak leftovers, Trash, and Timeshift snapshots
+          Description: Linux Mint Cleaner — safe system cleaner for Linux Mint
           EOF
 
-      - name: Build DEB package
+      - name: Build DEB
         run: dpkg-deb --build package
 
-      - name: Upload DEB to GitHub Release
-        uses: actions/upload-release-asset@v2
+      - name: Upload DEB to release
+        uses: svenstaro/upload-release-action@v2
         with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: package.deb
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: package.deb
           asset_name: linux-mint-cleaner.deb
-          asset_content_type: application/vnd.debian.binary-package
