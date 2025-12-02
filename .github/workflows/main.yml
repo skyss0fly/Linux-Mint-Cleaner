@@ -7,13 +7,17 @@ on:
 jobs:
   build-deb:
     runs-on: ubuntu-latest
+
     steps:
+      # 1. Checkout repository
       - name: Checkout
         uses: actions/checkout@v3
 
+      # 2. Install build dependencies
       - name: Install dependencies
         run: sudo apt-get update && sudo apt-get install -y devscripts debhelper fakeroot
 
+      # 3. Prepare package structure
       - name: Prepare package structure
         run: |
           mkdir -p package/usr/local/bin
@@ -27,6 +31,7 @@ jobs:
           cp debian/prerm package/DEBIAN/prerm
           chmod 755 package/DEBIAN/postinst package/DEBIAN/prerm
 
+      # 4. Create DEBIAN control file
       - name: Create DEBIAN control file
         run: |
           cat <<EOF > package/DEBIAN/control
@@ -39,12 +44,14 @@ jobs:
           Description: Linux Mint Cleaner — safe system cleaner for Linux Mint
           EOF
 
+      # 5. Build the .deb package
       - name: Build DEB
-        run: dpkg-deb --build package
+        run: dpkg-deb --build package linux-mint-cleaner.deb
 
-      - name: Upload DEB to release
-        uses: svenstaro/upload-release-action@v1
+      # 6. Upload to GitHub Release
+      - name: Upload .deb to release
+        uses: softprops/action-gh-release@v1
         with:
-          repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: package.deb
-          asset_name: linux-mint-cleaner.deb
+          files: linux-mint-cleaner.deb
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
