@@ -33,7 +33,7 @@ jobs:
           cp debian/prerm package/DEBIAN/prerm
           chmod 755 package/DEBIAN/postinst package/DEBIAN/prerm
 
-      # 4. Create DEBIAN control file
+      # 4. Create DEBIAN control file with updated dependencies
       - name: Create DEBIAN control file
         run: |
           cat <<EOF > package/DEBIAN/control
@@ -43,6 +43,7 @@ jobs:
           Priority: optional
           Architecture: all
           Maintainer: skyss0fly <skyss0flypersonal@gmail.com>
+          Depends: bash, sudo, desktop-file-utils, hicolor-icon-theme
           Description: Linux Mint Cleaner — safe system cleaner for Linux Mint
           EOF
 
