@@ -15,7 +15,7 @@ A safe, GUI-based system cleaner for Linux Mint, with:
 
 Clone the repo:
 ```
-git clone https://github.com/skyss0fly/mint-cleaner.git
+git clone https://github.com/skyss0fly/linux-mint-cleaner.git
 
 cd mint-cleaner
 sudo ./install.sh
@@ -34,8 +34,12 @@ Launch it from the Mint Menu under **System Tools**, or run:
 
 ```sudo rm /usr/local/bin/mint-cleaner
 sudo rm /usr/local/share/applications/mint-cleaner.desktop```
-
-
+```
+you may also choose to execute the uninstaller.
+```
+cd mint-cleaner
+sudo ./uninstall.sh
+```
 ...
 
 
