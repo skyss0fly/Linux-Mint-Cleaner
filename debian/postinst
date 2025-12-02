@@ -1,8 +1,5 @@
 #!/bin/bash
 set -e
 
-# Update icon and desktop caches (non-blocking, ignore errors)
-(gtk-update-icon-cache /usr/share/icons/hicolor || true) &
-(update-desktop-database /usr/share/applications || true) &
-
+# Exit immediately — do not run gtk-update-icon-cache or update-desktop-database
 exit 0
