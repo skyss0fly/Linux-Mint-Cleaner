@@ -1,5 +1,6 @@
-name: Build DEB Package
+name: Build and Release DEB Package
 
+# Trigger workflow when a release is created
 on:
   release:
     types: [created]
@@ -7,6 +8,9 @@ on:
 jobs:
   build-deb:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write  # Needed to push to releases
+      packages: write  # Needed if uploading assets
 
     steps:
       # 1. Checkout repository
@@ -20,9 +24,7 @@ jobs:
       # 3. Prepare package structure
       - name: Prepare package structure
         run: |
-          mkdir -p package/usr/local/bin
-          mkdir -p package/usr/share/applications
-          mkdir -p package/usr/share/icons/hicolor/scalable/apps
+          mkdir -p package/usr/local/bin package/usr/share/applications package/usr/share/icons/hicolor/scalable/apps
           cp src/mint-cleaner.sh package/usr/local/bin/mint-cleaner
           cp desktop/mint-cleaner.desktop package/usr/share/applications/mint-cleaner.desktop
           cp icons/system-cleaner.svg package/usr/share/icons/hicolor/scalable/apps/system-cleaner.svg
@@ -48,10 +50,10 @@ jobs:
       - name: Build DEB
         run: dpkg-deb --build package linux-mint-cleaner.deb
 
-      # 6. Upload to GitHub Release
+      # 6. Upload .deb to GitHub Release using PAT
       - name: Upload .deb to release
         uses: softprops/action-gh-release@v1
         with:
           files: linux-mint-cleaner.deb
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.REPO_PAT }}   # Use your Personal Access Token
