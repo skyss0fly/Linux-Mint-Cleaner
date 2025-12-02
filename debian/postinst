@@ -1,0 +1,15 @@
+#!/bin/bash
+set -e
+
+# Copy script
+install -m 755 ./src/mint-cleaner.sh /usr/local/bin/mint-cleaner
+
+# Copy desktop launcher
+install -m 644 ./desktop/mint-cleaner.desktop /usr/share/applications/mint-cleaner.desktop
+
+# Copy icon
+install -D -m 644 ./icons/system-cleaner.svg /usr/share/icons/hicolor/scalable/apps/system-cleaner.svg
+
+# Update caches
+gtk-update-icon-cache /usr/share/icons/hicolor || true
+update-desktop-database /usr/share/applications || true
