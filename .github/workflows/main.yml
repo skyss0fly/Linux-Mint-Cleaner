@@ -1,0 +1,46 @@
+name: Build DEB Package
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build-deb:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: sudo apt-get update && sudo apt-get install -y devscripts debhelper fakeroot
+
+      - name: Prepare package structure
+        run: |
+          mkdir -p package/usr/local/bin
+          mkdir -p package/usr/share/applications
+          mkdir -p package/usr/share/icons/hicolor/scalable/apps
+          cp src/mint-cleaner.sh package/usr/local/bin/mint-cleaner
+          cp desktop/mint-cleaner.desktop package/usr/share/applications/mint-cleaner.desktop
+          cp icons/system-cleaner.svg package/usr/share/icons/hicolor/scalable/apps/system-cleaner.svg
+
+      - name: Create debian control file
+        run: |
+          mkdir -p package/DEBIAN
+          cat <<EOF > package/DEBIAN/control
+          Package: linux-mint-cleaner
+          Version: ${{ github.event.release.tag_name }}
+          Section: utils
+          Priority: optional
+          Architecture: all
+          Maintainer: skyss0fly <skyss0flypersonal@gmail.com>
+          Description: Linux Mint Cleaner - Clean caches, Flatpak leftovers, Trash, and Timeshift snapshots
+          EOF
+
+      - name: Build DEB package
+        run: dpkg-deb --build package
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux-mint-cleaner-deb
+          path: package.deb
