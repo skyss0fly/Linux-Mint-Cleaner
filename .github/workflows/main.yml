@@ -44,7 +44,3 @@ jobs:
         with:
           name: linux-mint-cleaner-deb
           path: package.deb
-
-        with:
-          name: linux-mint-cleaner-deb
-          path: package.deb
