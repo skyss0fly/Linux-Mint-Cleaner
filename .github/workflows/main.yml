@@ -19,13 +19,21 @@ jobs:
           mkdir -p package/usr/local/bin
           mkdir -p package/usr/share/applications
           mkdir -p package/usr/share/icons/hicolor/scalable/apps
+          mkdir -p package/DEBIAN
+
+          # Copy files
           cp src/mint-cleaner.sh package/usr/local/bin/mint-cleaner
           cp desktop/mint-cleaner.desktop package/usr/share/applications/mint-cleaner.desktop
           cp icons/system-cleaner.svg package/usr/share/icons/hicolor/scalable/apps/system-cleaner.svg
+          cp debian/postinst package/DEBIAN/postinst
+          cp debian/prerm package/DEBIAN/prerm
 
-      - name: Create debian control file
+          # Set permissions
+          chmod 755 package/DEBIAN/postinst
+          chmod 755 package/DEBIAN/prerm
+
+      - name: Create DEBIAN control file
         run: |
-          mkdir -p package/DEBIAN
           cat <<EOF > package/DEBIAN/control
           Package: linux-mint-cleaner
           Version: ${{ github.event.release.tag_name }}
@@ -39,8 +47,10 @@ jobs:
       - name: Build DEB package
         run: dpkg-deb --build package
 
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
+      - name: Upload DEB to GitHub Release
+        uses: actions/upload-release-asset@v2
         with:
-          name: linux-mint-cleaner-deb
-          path: package.deb
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: package.deb
+          asset_name: linux-mint-cleaner.deb
+          asset_content_type: application/vnd.debian.binary-package
