@@ -7,6 +7,6 @@ Build-Depends: debhelper (>= 12)
 
 Package: linux-mint-cleaner
 Architecture: all
-Depends: bash, sudo
+Depends: bash, sudo, desktop-file-utils, hicolor-icon-theme
 Description: Linux Mint Cleaner
  A simple tool to clean caches, Flatpak leftovers, Trash, and Timeshift snapshots safely.
