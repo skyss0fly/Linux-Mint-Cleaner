@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # ================================================================
 #  Linux Mint Cleaner GUI - Advanced Version
 #  Modes: Light / Full / Timeshift Only
@@ -8,25 +9,26 @@
 set -euo pipefail
 
 # -------------------------------
-# Log setup
+# Logging setup in app folder
 # -------------------------------
-LOGFILE="/usr/share/mint-cleaner.log"
-DIR="$(dirname "$LOGFILE")"
+APP_DIR="$(dirname "$(realpath "$0")")"   # folder where the script resides
+LOGFILE="$APP_DIR/mint-cleaner.log"
 
-# Ensure directory exists and log file is writable
-sudo mkdir -p "$DIR"
-sudo touch "$LOGFILE"
-sudo chmod 644 "$LOGFILE"
+# Ensure log file exists
+touch "$LOGFILE"
 
+# Function to log messages
 log() {
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*" >> "$LOGFILE"
 }
 
+log "Linux Mint Cleaner started."
+
 # -------------------------------
-# Mode selector (GUI)
+# Mode selector
 # -------------------------------
 MODE=$(zenity --list \
-    --title="Linux Mint Cleaner V0.1.6-Dev2" \
+    --title="Linux Mint Cleaner" \
     --text="Choose a cleanup mode:" \
     --column="Mode" --column="Description" \
     "Light" "Safe cleaning: caches, thumbnails, trash" \
@@ -36,9 +38,9 @@ MODE=$(zenity --list \
 
 [[ -z "$MODE" ]] && exit 0
 
-# -------------------------------
-# Cleanup task
-# -------------------------------
+# ================================
+# GUI progress wrapper
+# ================================
 cleanup_task() {
 (
 P=0
@@ -50,104 +52,103 @@ progress() {
     P=$((P+7))
 }
 
-# -------------------------------
+# ---------------------------
 # 1. APT cache (Full only)
-# -------------------------------
+# ---------------------------
 if [[ "$MODE" == "Full" ]]; then
     progress "Cleaning APT cache..."
-    sudo apt-get clean
-    sudo rm -rf /var/cache/apt/archives/*
+    sudo apt-get clean &>/dev/null
+    sudo rm -rf /var/cache/apt/archives/* &>/dev/null
 fi
 
 progress "Cleaning system cache..."
-sudo rm -rf /var/cache/* || true
+sudo rm -rf /var/cache/* &>/dev/null
 
-# -------------------------------
-# 2. User cache (excluding browsers)
-# -------------------------------
-progress "Cleaning user cache..."
+# ---------------------------
+# 2. User cache (browser safe)
+# ---------------------------
+progress "Cleaning user cache (excluding browsers)..."
 BROWSER_DIRS=("google-chrome" "chromium" "mozilla" "brave" "vivaldi")
 
-shopt -s nullglob
 for dir in ~/.cache/*; do
     skip=false
     for b in "${BROWSER_DIRS[@]}"; do
         [[ "$dir" == *"/$b" ]] && skip=true
     done
-    if [ "$skip" = false ]; then
-        rm -rf "$dir" || true
+    if ! $skip; then
+        rm -rf "$dir" &>/dev/null
     fi
 done
-shopt -u nullglob
 
-# -------------------------------
+# ---------------------------
 # 3. Thumbnails
-# -------------------------------
+# ---------------------------
 progress "Cleaning thumbnail cache..."
-rm -rf ~/.cache/thumbnails/* || true
+rm -rf ~/.cache/thumbnails/* &>/dev/null
 
-# -------------------------------
+# ---------------------------
 # 4. Trash
-# -------------------------------
+# ---------------------------
 progress "Emptying Trash..."
-rm -rf ~/.local/share/Trash/files/* ~/.local/share/Trash/info/* || true
+rm -rf ~/.local/share/Trash/files/* &>/dev/null
+rm -rf ~/.local/share/Trash/info/* &>/dev/null
 
-# -------------------------------
+# ---------------------------
 # 5. Flatpak cache (Full only)
-# -------------------------------
+# ---------------------------
 if [[ "$MODE" == "Full" ]]; then
     progress "Cleaning Flatpak leftover data..."
-    sudo flatpak uninstall --unused -y || true
-    rm -rf ~/.var/app/*/cache/* || true
+    flatpak uninstall --unused -y &>/dev/null
+    rm -rf ~/.var/app/*/cache/* &>/dev/null || true
 fi
 
-# -------------------------------
-# 6. Timeshift snapshots (Full / Timeshift Only)
-# -------------------------------
+# ---------------------------
+# 6. Timeshift snapshots (Full or Timeshift Only)
+# ---------------------------
 if [[ "$MODE" == "Full" || "$MODE" == "Timeshift Only" ]]; then
-    progress "Checking Timeshift snapshots..."
-    SNAPSHOTS=$(sudo timeshift --list | awk '/----/ {found=1; next} found && NF>=3 {print $3}')
 
-    if [[ -z "$SNAPSHOTS" ]]; then
-        progress "No Timeshift snapshots found. Skipping."
-    else
-        LATEST=$(echo "$SNAPSHOTS" | tail -n 1)
+progress "Checking Timeshift snapshots..."
 
-        if zenity --question --title="Timeshift Cleanup" \
-            --text="Newest Timeshift snapshot:\n$LATEST\n\nDelete all older snapshots?"; then
-            for snap in $SNAPSHOTS; do
-                if [[ "$snap" != "$LATEST" ]]; then
-                    progress "Deleting old Timeshift snapshot: $snap"
-                    sudo timeshift --delete --snapshot "$snap"
-                else
-                    progress "Keeping newest snapshot: $snap"
-                fi
-            done
+SNAPSHOTS=$(sudo timeshift --list | awk '
+    /----/ {found=1; next} 
+    found && NF>=3 {print $3}
+')
+
+if [[ -z "$SNAPSHOTS" ]]; then
+    progress "No Timeshift snapshots found. Skipping."
+else
+    LATEST=$(echo "$SNAPSHOTS" | tail -n 1)
+
+    zenity --question \
+        --title="Timeshift Cleanup" \
+        --text="Newest Timeshift snapshot:\n$LATEST\n\nDelete all older snapshots?" \
+        || { P=99; progress "Skipped Timeshift cleanup."; }
+
+    for snap in $SNAPSHOTS; do
+        if [[ "$snap" != "$LATEST" ]]; then
+            progress "Deleting old Timeshift snapshot: $snap"
+            sudo timeshift --delete --snapshot "$snap" &>/dev/null
         else
-            progress "Skipped Timeshift cleanup."
+            progress "Keeping newest snapshot: $snap"
         fi
-    fi
+    done
 fi
+
+fi # Timeshift
 
 progress "Done!"
 echo "100"
-
 ) | zenity --progress \
-    --title="Linux Mint Cleaner V0.1.6-Dev2" \
+    --title="Linux Mint Cleaner" \
     --text="Starting cleanup..." \
     --percentage=0 \
     --auto-close \
     --width=360
+
 }
 
-# -------------------------------
-# Run cleanup
-# -------------------------------
 cleanup_task
 
-# -------------------------------
-# Completion message
-# -------------------------------
 zenity --info \
     --title="Cleanup Complete" \
     --text="Cleanup completed successfully!\n\nLog saved to:\n$LOGFILE"
