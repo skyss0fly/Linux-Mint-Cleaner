@@ -10,6 +10,9 @@ A safe, GUI-based system cleaner for Linux Mint, with:
 - Logging
 - GUI Zenity interface
 - Desktop launcher support
+
+# ⚠️ Known issues: ⚠️
+> [Launcher Issue](https://github.com/skyss0fly/Linux-Mint-Cleaner/issues/3)
 # Screenshots:
 ![Image 1](https://github.com/skyss0fly/Linux-Mint-Cleaner/blob/main/images/1.png)
 ## Installation
