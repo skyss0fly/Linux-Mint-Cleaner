@@ -24,7 +24,7 @@ jobs:
       # 3. Prepare package structure
       - name: Prepare package structure
         run: |
-          mkdir -p package/usr/bin
+          mkdir -p package/usr/local/bin
           mkdir -p package/usr/share/applications
           mkdir -p package/usr/share/icons/hicolor/scalable/apps
 
