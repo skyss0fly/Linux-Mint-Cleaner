@@ -11,8 +11,8 @@ set -euo pipefail
 # -------------------------------
 # Logging setup in app folder
 # -------------------------------
-APP_DIR="$(dirname "$(realpath "$0")")"   # folder where the script resides
-LOGFILE="$APP_DIR/mint-cleaner.log"
+# APP_DIR="$(dirname "$(realpath "$0")")"   # folder where the script resides
+LOGFILE="$HOME/.local/share/mint-cleaner.log"
 
 # Ensure log file exists
 touch "$LOGFILE"
