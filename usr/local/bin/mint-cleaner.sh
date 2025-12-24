@@ -28,7 +28,7 @@ log "Linux Mint Cleaner started."
 # Mode selector
 # -------------------------------
 MODE=$(zenity --list \
-    --title="Linux Mint Cleaner V1.0.6" \
+    --title="Linux Mint Cleaner V1.0.7" \
     --text="Choose a cleanup mode:" \
     --column="Mode" --column="Description" \
     "Light" "Safe cleaning: caches, thumbnails, trash" \
@@ -139,7 +139,7 @@ fi # Timeshift
 progress "Done!"
 echo "100"
 ) | zenity --progress \
-    --title="Linux Mint Cleaner V1.0.6" \
+    --title="Linux Mint Cleaner V1.0.7" \
     --text="Starting cleanup..." \
     --percentage=0 \
     --auto-close \
