@@ -29,8 +29,8 @@ jobs:
           mkdir -p package/usr/share/icons/hicolor/scalable/apps
 
           # Copy main script
-          cp src/mint-cleaner.sh package/usr/bin/mint-cleaner
-          chmod 755 package/usr/bin/mint-cleaner
+          cp src/mint-cleaner.sh package/usr/local/bin/mint-cleaner
+          chmod 755 package/usr/local/bin/mint-cleaner
 
           # Copy desktop file (single entry)
           cp desktop/linux-mint-cleaner.desktop package/usr/share/applications/linux-mint-cleaner.desktop
