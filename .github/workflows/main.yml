@@ -9,8 +9,8 @@ jobs:
   build-deb:
     runs-on: ubuntu-latest
     permissions:
-      contents: write  # Needed to push to releases
-      packages: write  # Needed if uploading assets
+      contents: write
+      packages: write
 
     steps:
       # 1. Checkout repository
@@ -19,23 +19,32 @@ jobs:
 
       # 2. Install build dependencies
       - name: Install dependencies
-        run: sudo apt-get update && sudo apt-get install -y devscripts debhelper fakeroot
+        run: sudo apt-get update && sudo apt-get install -y devscripts debhelper fakeroot desktop-file-utils hicolor-icon-theme
 
       # 3. Prepare package structure
       - name: Prepare package structure
         run: |
-          mkdir -p package/usr/local/bin package/usr/share/applications package/usr/share/icons/hicolor/scalable/apps
-          cp src/mint-cleaner.sh package/usr/local/bin/mint-cleaner
-          chmod 755 package/usr/local/bin/mint-cleaner
-          cp desktop/mint-cleaner.desktop package/usr/share/applications/mint-cleaner.desktop
-          cp icons/system-cleaner.svg package/usr/share/icons/hicolor/scalable/apps/system-cleaner.svg
+          mkdir -p package/usr/bin
+          mkdir -p package/usr/share/applications
+          mkdir -p package/usr/share/icons/hicolor/scalable/apps
+
+          # Copy main script
+          cp src/mint-cleaner.sh package/usr/bin/mint-cleaner
+          chmod 755 package/usr/bin/mint-cleaner
+
+          # Copy desktop file (single entry)
+          cp desktop/linux-mint-cleaner.desktop package/usr/share/applications/linux-mint-cleaner.desktop
+
+          # Copy icon with correct name
+          cp icons/linux-mint-cleaner.svg package/usr/share/icons/hicolor/scalable/apps/linux-mint-cleaner.svg
+
+          # Copy DEBIAN scripts
           mkdir -p package/DEBIAN
           cp debian/postinst package/DEBIAN/postinst
           cp debian/prerm package/DEBIAN/prerm
           chmod 755 package/DEBIAN/postinst package/DEBIAN/prerm
-          
 
-      # 4. Create DEBIAN control file with updated dependencies
+      # 4. Create DEBIAN control file
       - name: Create DEBIAN control file
         run: |
           cat <<EOF > package/DEBIAN/control
@@ -45,7 +54,7 @@ jobs:
           Priority: optional
           Architecture: all
           Maintainer: skyss0fly <skyss0flypersonal@gmail.com>
-          Depends: bash, sudo, desktop-file-utils, hicolor-icon-theme
+          Depends: bash, zenity, timeshift, desktop-file-utils, hicolor-icon-theme
           Description: Linux Mint Cleaner — safe system cleaner for Linux Mint
           EOF
 
@@ -59,4 +68,4 @@ jobs:
         with:
           files: linux-mint-cleaner.deb
         env:
-          GITHUB_TOKEN: ${{ secrets.REPO_PAT }}   # Use your Personal Access Token
+          GITHUB_TOKEN: ${{ secrets.REPO_PAT }}
