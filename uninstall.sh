@@ -8,7 +8,7 @@ set -euo pipefail
 # Paths installed by install.sh
 BIN_DEST="/usr/local/bin/mint-cleaner"
 DESKTOP_DEST="/usr/share/applications/mint-cleaner.desktop"
-ICON_DEST="/usr/share/icons/hicolor/scalable/apps/system-cleaner.svg"
+ICON_DEST="/usr/share/icons/hicolor/scalable/apps/linux-mint-cleaner.svg"
 
 echo "Uninstalling Linux Mint Cleaner..."
 
