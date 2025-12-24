@@ -6,9 +6,9 @@ set -euo pipefail
 # ------------------------
 
 # Project folder paths (relative to installer)
-SCRIPT_SRC="./src/mint-cleaner.sh"
-DESKTOP_SRC="./desktop/mint-cleaner.desktop"
-ICON_SRC="./icons/system-cleaner.svg"
+SCRIPT_SRC="./usr/local/bin/mint-cleaner.sh"
+DESKTOP_SRC="./usr/share/applications/mint-cleaner.desktop"
+ICON_SRC="./usr/share/icons/hicolor/scalable/apps/linux-mint-cleaner.svg"
 
 # Destination paths
 BIN_DEST="/usr/local/bin/mint-cleaner"
