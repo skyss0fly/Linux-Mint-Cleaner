@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Linux Mint Cleaner
 Comment=Clean system caches, Flatpak leftovers, and Timeshift snapshots safely
-Exec=/usr/local/bin/mint-cleaner
+Exec=/usr/bin/mint-cleaner
 Icon=/usr/share/icons/hicolor/scalable/apps/system-cleaner.svg
 Terminal=false
 Type=Application
