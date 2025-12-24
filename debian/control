@@ -1,4 +1,5 @@
 Source: linux-mint-cleaner
+version: 1.0.7-Dev3
 Section: utils
 Priority: optional
 Maintainer: skyss0fly <skyss0flypersonal@gmail.com>
