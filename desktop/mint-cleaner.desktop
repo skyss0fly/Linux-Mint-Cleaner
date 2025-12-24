@@ -2,7 +2,7 @@
 Name=Linux Mint Cleaner
 Comment=Clean system caches, Flatpak leftovers, and Timeshift snapshots safely
 Exec=/usr/local/bin/mint-cleaner
-Icon=mint-cleaner
+Icon=linux-mint-cleaner
 Terminal=false
 Type=Application
 Categories=System;Utility;
